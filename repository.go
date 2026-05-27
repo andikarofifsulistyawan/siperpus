@@ -1,6 +1,10 @@
 package main
 
-import "strings"
+import (
+	"errors"
+	"strings"
+	"time"
+)
 
 type BukuRepository struct {
 	KoleksiBuku DaftarBuku
@@ -271,4 +275,104 @@ func (repository *BukuRepository) GetBukuByJudulBinarySearch(judul string) int {
 	}
 
 	return -1
+}
+
+func (repository *BukuRepository) CreateBuku(buku Buku) error {
+	var err error
+
+	if repository.TotalBuku == MEMORY_KAPASITAS_ARRAY_MAKSIMAL {
+		return errors.New("total koleksi sudah mencapai batas maksimum")
+	}
+
+	if repository.GetBukuByIDBinarySearch(buku.ID) != -1 {
+		return errors.New("ID buku sudah digunakan oleh buku lain")
+	}
+
+	err = repository.ValidasiBuku(buku)
+
+	if err != nil {
+		return err
+	}
+
+	repository.KoleksiBuku[repository.TotalBuku] = buku
+	repository.TotalBuku++
+
+	return nil
+}
+
+func (repository *BukuRepository) UpdateBukuByID(id string, buku Buku) error {
+	var err error
+	var index int
+
+	index = repository.GetBukuByIDBinarySearch(id)
+
+	if index == -1 {
+		return errors.New("buku dengan ID " + id + " tidak ditemukan")
+	}
+
+	if repository.GetBukuByIDBinarySearch(buku.ID) != -1 && buku.ID != id {
+		return errors.New("ID buku sudah digunakan oleh buku lain")
+	}
+
+	err = repository.ValidasiBuku(buku)
+
+	if err != nil {
+		return err
+	}
+
+	repository.KoleksiBuku[index] = buku
+
+	return nil
+}
+
+func (repository *BukuRepository) DeleteBukuByID(id string) error {
+	var index int
+	var i int
+
+	index = repository.GetBukuByIDBinarySearch(id)
+
+	if index == -1 {
+		return errors.New("buku dengan ID " + id + " tidak ditemukan")
+	}
+
+	for i = index; i < repository.TotalBuku-1; i++ {
+		repository.KoleksiBuku[i] = repository.KoleksiBuku[i+1]
+	}
+
+	repository.KoleksiBuku[repository.TotalBuku-1] = Buku{}
+	repository.TotalBuku--
+
+	return nil
+}
+
+func (repository *BukuRepository) ValidasiBuku(buku Buku) error {
+	if strings.TrimSpace(buku.ID) == "" {
+		return errors.New("ID buku tidak boleh kosong")
+	}
+
+	if strings.TrimSpace(buku.Judul) == "" {
+		return errors.New("judul buku tidak boleh kosong")
+	}
+
+	if strings.TrimSpace(buku.Penulis) == "" {
+		return errors.New("penulis buku tidak boleh kosong")
+	}
+
+	if strings.TrimSpace(buku.Kategori) == "" {
+		return errors.New("kategori buku tidak boleh kosong")
+	}
+
+	if strings.TrimSpace(buku.Penerbit) == "" {
+		return errors.New("penerbit buku tidak boleh kosong")
+	}
+
+	if buku.TahunTerbit == 0 {
+		return errors.New("tahun terbit buku harus berupa bilangan bulat positif dan tidak boleh kosong")
+	}
+
+	if buku.TahunTerbit > uint(time.Now().Year()) {
+		return errors.New("tahun terbit buku tidak boleh melebihi tahun saat ini")
+	}
+
+	return nil
 }
