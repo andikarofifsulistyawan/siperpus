@@ -376,3 +376,31 @@ func (repository *BukuRepository) ValidasiBuku(buku Buku) error {
 
 	return nil
 }
+
+func (repository *BukuRepository) TotalBukuPerKategori() map[string]int {
+	var statistikKategori map[string]int
+	var i int
+
+	statistikKategori = make(map[string]int)
+
+	for i = 0; i < repository.TotalBuku; i++ {
+		statistikKategori[repository.KoleksiBuku[i].Kategori]++
+	}
+
+	return statistikKategori
+}
+
+func (repository *BukuRepository) TotalBukuTersedia() int {
+	var total int
+	var i int
+
+	total = 0
+
+	for i = 0; i < repository.TotalBuku; i++ {
+		if repository.KoleksiBuku[i].Tersedia {
+			total++
+		}
+	}
+
+	return total
+}
