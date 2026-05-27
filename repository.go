@@ -223,3 +223,52 @@ func (repository *BukuRepository) GetBukuByIDBinarySearch(id string) int {
 
 	return -1
 }
+
+func (repository *BukuRepository) GetBukuByJudulSequentialSearch(judul string) int {
+	var judulLowercase string
+	var i int
+
+	judulLowercase = strings.ToLower(judul)
+
+	for i = 0; i < repository.TotalBuku; i++ {
+		if strings.ToLower(repository.KoleksiBuku[i].Judul) == judulLowercase {
+			return i
+		}
+	}
+
+	return -1
+}
+
+func (repository *BukuRepository) GetBukuByJudulBinarySearch(judul string) int {
+	var hasil DaftarBuku
+	var judulLowercase string
+	var judulTengahLowercase string
+	var kiri int
+	var kanan int
+	var tengah int
+
+	if repository.TotalBuku == 0 {
+		return -1
+	}
+
+	hasil = repository.GetAllBukuSortByJudulAscendingInsertionSort()
+	judulLowercase = strings.ToLower(judul)
+
+	kiri = 0
+	kanan = repository.TotalBuku - 1
+
+	for kiri <= kanan {
+		tengah = (kiri + kanan) / 2
+		judulTengahLowercase = strings.ToLower(hasil[tengah].Judul)
+
+		if judulTengahLowercase == judulLowercase {
+			return tengah
+		} else if judulTengahLowercase < judulLowercase {
+			kiri = tengah + 1
+		} else {
+			kanan = tengah - 1
+		}
+	}
+
+	return -1
+}
