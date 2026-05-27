@@ -1,0 +1,3 @@
+package main
+
+const MEMORY_KAPASITAS_ARRAY_MAKSIMAL int = 500
