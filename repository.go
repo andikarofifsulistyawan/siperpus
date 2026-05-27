@@ -1,8 +1,64 @@
 package main
 
+import "strings"
+
 type BukuRepository struct {
 	KoleksiBuku DaftarBuku
 	TotalBuku   int
+}
+
+func (repository *BukuRepository) GetAllBukuSortByIDAscendingInsertionSort() DaftarBuku {
+	var hasil DaftarBuku
+	var temp Buku
+	var i int
+	var j int
+
+	if repository.TotalBuku == 0 {
+		return DaftarBuku{}
+	}
+
+	hasil = repository.KoleksiBuku
+
+	for i = 1; i < repository.TotalBuku; i++ {
+		temp = hasil[i]
+		j = i
+
+		for j > 0 && strings.ToLower(temp.ID) < strings.ToLower(hasil[j-1].ID) {
+			hasil[j] = hasil[j-1]
+			j--
+		}
+
+		hasil[j] = temp
+	}
+
+	return hasil
+}
+
+func (repository *BukuRepository) GetAllBukuSortByJudulAscendingInsertionSort() DaftarBuku {
+	var hasil DaftarBuku
+	var temp Buku
+	var i int
+	var j int
+
+	if repository.TotalBuku == 0 {
+		return DaftarBuku{}
+	}
+
+	hasil = repository.KoleksiBuku
+
+	for i = 1; i < repository.TotalBuku; i++ {
+		temp = hasil[i]
+		j = i
+
+		for j > 0 && strings.ToLower(temp.Judul) < strings.ToLower(hasil[j-1].Judul) {
+			hasil[j] = hasil[j-1]
+			j--
+		}
+
+		hasil[j] = temp
+	}
+
+	return hasil
 }
 
 func (repository *BukuRepository) GetAllBukuSortByTahunTerbitAscendingSelectionSort() DaftarBuku {
